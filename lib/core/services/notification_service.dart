@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:notiiver/core/models/notification_model.dart';
@@ -25,6 +27,7 @@ class NotificationService {
     print('Device Token: $_deviceToken');
 
     // Listen for token refresh
+    // Note: For reactive UI updates on token refresh, consider using ValueNotifier
     _firebaseMessaging.onTokenRefresh.listen((token) {
       _deviceToken = token;
       print('Token refreshed: $token');
@@ -115,11 +118,11 @@ class NotificationService {
     );
 
     await _localNotifications.show(
-      notification.receivedAt.millisecondsSinceEpoch ~/ 1000,
+      notification.receivedAt.microsecondsSinceEpoch,
       notification.title ?? 'New Notification',
       notification.body ?? '',
       details,
-      payload: notification.toJson().toString(),
+      payload: jsonEncode(notification.toJson()),
     );
   }
 
